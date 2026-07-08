@@ -1,3 +1,10 @@
+Project Console: https://console.firebase.google.com/project/thinkkk-4f7ea/overview
+Hosting URL: https://thinkkk-4f7ea.web.app
+
+
+
+
+
 # SlotWise
 
 SlotWise is a simple, production-ready appointment booking dashboard built with Angular (v19) and Firebase. It enables an authenticated owner to schedule, edit, and delete appointment slots, and lets customers reserve slots in real time. The app utilizes Firestore realtime listeners to keep both the customer booking view and the owner's dashboard perfectly synchronized in real time.
