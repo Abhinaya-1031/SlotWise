@@ -1,0 +1,213 @@
+<div class="dashboard-wrapper">
+
+  <!-- Toast Notification -->
+  <div class="toast" *ngIf="toastMessage" [class.toast-error]="toastType === 'error'" [class.toast-success]="toastType === 'success'">
+    <span class="toast-icon">{{ toastType === 'success' ? '✅' : '❌' }}</span>
+    <span>{{ toastMessage }}</span>
+    <button class="toast-close" (click)="toastMessage = ''">✕</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">📅</span>
+      <span class="brand-text">Slot<strong>Wise</strong></span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item" [class.active]="activeTab === 'bookings'" (click)="activeTab = 'bookings'">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Bookings</span>
+        <span class="nav-badge" *ngIf="totalBookings > 0">{{ totalBookings }}</span>
+      </button>
+      <button class="nav-item" [class.active]="activeTab === 'slots'" (click)="activeTab = 'slots'">
+        <span class="nav-icon">🗓️</span>
+        <span class="nav-label">Manage Slots</span>
+        <span class="nav-badge" *ngIf="totalSlots > 0">{{ totalSlots }}</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <span class="user-avatar">👤</span>
+        <span class="user-label">Owner</span>
+      </div>
+      <button class="logout-btn" (click)="logout()" title="Sign Out">
+        <span>🚪</span>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+      <div class="page-title">
+        <h1 *ngIf="activeTab === 'bookings'">📋 Bookings Dashboard</h1>
+        <h1 *ngIf="activeTab === 'slots'">🗓️ Manage Slots</h1>
+        <p *ngIf="activeTab === 'bookings'">Monitor and manage all customer reservations in real time</p>
+        <p *ngIf="activeTab === 'slots'">Create, edit, and remove appointment time slots</p>
+      </div>
+      <button class="btn btn-primary create-slot-shortcut" *ngIf="activeTab === 'slots'" (click)="openCreateForm()">
+        ➕ New Slot
+      </button>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Connecting to real-time database...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="content-area fade-in">
+
+      <!-- ===== BOOKINGS TAB ===== -->
+      <section *ngIf="activeTab === 'bookings'">
+
+        <!-- Summary Cards Row -->
+        <div class="stats-grid">
+          <div class="stat-card stat-blue">
+            <div class="stat-icon">🗓️</div>
+            <div class="stat-info">
+              <span class="stat-value">{{ totalSlots }}</span>
+              <span class="stat-label">Total Slots</span>
+            </div>
+          </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <span class="stat-value">{{ totalBookings }}</span>
+              <span class="stat-label">Total Bookings</span>
+            </div>
+          </div>
+          <div class="stat-card stat-green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <span class="stat-value">{{ availableSlots }}</span>
+              <span class="stat-label">Available Slots</span>
+            </div>
+          </div>
+          <div class="stat-card stat-teal">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-info">
+              <span class="stat-value">{{ confirmedBookings }}</span>
+              <span class="stat-label">Confirmed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              type="text"
+              [(ngModel)]="bookingSearchQuery"
+              placeholder="Search by name, contact, date or time..."
+              class="search-input"
+            />
+            <button *ngIf="bookingSearchQuery" class="search-clear" (click)="bookingSearchQuery = ''">✕</button>
+          </div>
+          <div class="status-filters">
+            <button class="filter-chip" [class.active]="bookingStatusFilter === 'All'" (click)="bookingStatusFilter = 'All'">All</button>
+            <button class="filter-chip pending" [class.active]="bookingStatusFilter === 'Pending'" (click)="bookingStatusFilter = 'Pending'">Pending</button>
+            <button class="filter-chip confirmed" [class.active]="bookingStatusFilter === 'Confirmed'" (click)="bookingStatusFilter = 'Confirmed'">Confirmed</button>
+            <button class="filter-chip cancelled" [class.active]="bookingStatusFilter === 'Cancelled'" (click)="bookingStatusFilter = 'Cancelled'">Cancelled</button>
+          </div>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="card card-table">
+          <div class="card-header">
+            <div>
+              <h3>Upcoming Bookings</h3>
+              <p class="card-subtitle">{{ filteredBookings.length }} result{{ filteredBookings.length !== 1 ? 's' : '' }}</p>
+            </div>
+          </div>
+
+          <div class="table-responsive" *ngIf="filteredBookings.length > 0; else noBookings">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer Name</th>
+                  <th>Contact</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let booking of filteredBookings; let i = index" class="table-row">
+                  <td class="row-num">{{ i + 1 }}</td>
+                  <td>
+                    <div class="customer-cell">
+                      <span class="customer-avatar">{{ booking.name.charAt(0).toUpperCase() }}</span>
+                      <span class="customer-name">{{ booking.name }}</span>
+                    </div>
+                  </td>
+                  <td class="contact-cell">{{ booking.contact }}</td>
+                  <td><span class="badge date-badge">📅 {{ booking.slotDate }}</span></td>
+                  <td><span class="badge time-badge">⏰ {{ booking.slotTime }}</span></td>
+                  <td>
+                    <select
+                      [value]="booking.status"
+                      (change)="updateStatus(booking.id!, $event)"
+                      [class]="'status-select status-' + booking.status.toLowerCase()"
+                    >
+                      <option value="Pending">⏳ Pending</option>
+                      <option value="Confirmed">✅ Confirmed</option>
+                      <option value="Cancelled">❌ Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ng-template #noBookings>
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <h4>No Bookings Found</h4>
+              <p *ngIf="bookingSearchQuery || bookingStatusFilter !== 'All'">
+                No bookings match your current filters. Try clearing the search or changing the status filter.
+              </p>
+              <p *ngIf="!bookingSearchQuery && bookingStatusFilter === 'All'">
+                Customers can make reservations from the public
+                <a routerLink="/booking" class="inline-link">booking page</a>.
+              </p>
+              <button *ngIf="bookingSearchQuery || bookingStatusFilter !== 'All'" class="btn btn-secondary mt-12" (click)="bookingSearchQuery = ''; bookingStatusFilter = 'All'">
+                Clear Filters
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      </section>
+
+      <!-- ===== SLOTS TAB ===== -->
+      <section *ngIf="activeTab === 'slots'" class="fade-in">
+
+        <!-- Create/Edit Slot Modal -->
+        <div class="modal-backdrop" *ngIf="showSlotForm" (click)="closeOverlayOnBackdrop($event, backdropRef)" #backdropRef>
+          <div class="modal-card" (click)="$event.stopPropagation()">
+            <app-slot-form
+              [slot]="editingSlot"
+              (close)="closeForm()"
+              (saved)="onSlotSaved($event)"
+            ></app-slot-form>
+          </div>
+        </div>
+
+        <!-- Slot List (edit events bubble up) -->
+        <app-slot-list
+          (edit)="openEditForm($event)"
+          (toastNotify)="showToast($event.message, $event.type)"
+        ></app-slot-list>
+
+      </section>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="glass-card">
+    <div class="logo-area">
+      <span class="logo-icon">📅</span>
+      <h2>Slot<span>Wise</span></h2>
+      <p class="subtitle">Owner Appointment Management</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="owner@slotwise.com"
+            [class.invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+          />
+        </div>
+        <div *ngIf="loginForm.get('email')?.touched" class="error-container">
+          <div class="error-msg" *ngIf="loginForm.get('email')?.errors?.['required']">
+            Email is required.
+          </div>
+          <div class="error-msg" *ngIf="loginForm.get('email')?.errors?.['email']">
+            Please enter a valid email address.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="••••••••"
+            [class.invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+          />
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched" class="error-container">
+          <div class="error-msg" *ngIf="loginForm.get('password')?.errors?.['required']">
+            Password is required.
+          </div>
+          <div class="error-msg" *ngIf="loginForm.get('password')?.errors?.['minlength']">
+            Password must be at least 6 characters.
+          </div>
+        </div>
+      </div>
+
+      <div class="error-alert" *ngIf="errorMessage">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+      </div>
+
+      <button type="submit" [disabled]="isLoading" class="btn btn-primary btn-block">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading" class="spinner">Signing in...</span>
+      </button>
+    </form>
+  </div>
+</div>

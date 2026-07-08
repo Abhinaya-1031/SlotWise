@@ -1,0 +1,186 @@
+<div class="booking-page">
+
+  <!-- Top Nav Bar -->
+  <nav class="topnav">
+    <div class="nav-brand">
+      <span class="nav-logo">📅</span>
+      <span class="nav-title">Slot<strong>Wise</strong></span>
+    </div>
+    <a class="nav-link" routerLink="/login">Owner Login →</a>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h2>Book Your Appointment</h2>
+      <p>Browse available time slots, select one that works for you, and confirm your reservation instantly.</p>
+    </div>
+  </section>
+
+  <div class="page-body">
+
+    <!-- LEFT: Slot List -->
+    <div class="slots-panel">
+      <div class="panel-header">
+        <h3>📋 Available Slots</h3>
+        <p class="panel-sub">Real-time — updates automatically</p>
+      </div>
+
+      <!-- Search for slots -->
+      <div class="slot-search-box" *ngIf="!isLoading && futureSlots.length > 0">
+        <span class="s-icon">🔍</span>
+        <input type="text" [(ngModel)]="slotSearch" (ngModelChange)="filterSlots()"
+          placeholder="Search by date or time..." class="s-input" />
+        <button *ngIf="slotSearch" (click)="slotSearch = ''; filterSlots()" class="s-clear">✕</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading available slots...</p>
+      </div>
+
+      <!-- No slots -->
+      <div class="empty-state" *ngIf="!isLoading && futureSlots.length === 0">
+        <span class="empty-icon">🏖️</span>
+        <h4>No Slots Available</h4>
+        <p>No appointment slots have been scheduled. Please check back soon!</p>
+      </div>
+
+      <!-- Search: no match -->
+      <div class="empty-state" *ngIf="!isLoading && futureSlots.length > 0 && displayedSlots.length === 0">
+        <span class="empty-icon">🔍</span>
+        <h4>No Matching Slots</h4>
+        <p>No slots match "{{ slotSearch }}".</p>
+        <button class="btn btn-secondary mt-10" (click)="slotSearch = ''; filterSlots()">Clear</button>
+      </div>
+
+      <!-- Slot Cards -->
+      <div class="slots-list" *ngIf="!isLoading && displayedSlots.length > 0">
+        <div
+          *ngFor="let slot of displayedSlots"
+          class="slot-row"
+          [class.selected]="selectedSlot?.id === slot.id"
+          [class.full]="slot.booked >= slot.capacity"
+          (click)="selectSlot(slot)"
+        >
+          <!-- Left: Date/Time -->
+          <div class="slot-row-left">
+            <div class="slot-row-icon">📅</div>
+            <div>
+              <div class="slot-row-date">{{ slot.date }}</div>
+              <div class="slot-row-time">{{ slot.time }}</div>
+            </div>
+          </div>
+
+          <!-- Center: Stats -->
+          <div class="slot-row-center">
+            <div class="pill-stat">
+              <span class="ps-label">Capacity</span>
+              <span class="ps-val">{{ slot.capacity }}</span>
+            </div>
+            <div class="pill-stat">
+              <span class="ps-label">Booked</span>
+              <span class="ps-val indigo">{{ slot.booked }}</span>
+            </div>
+            <div class="pill-stat">
+              <span class="ps-label">Left</span>
+              <span class="ps-val" [class.red]="slot.capacity - slot.booked === 0">{{ slot.capacity - slot.booked }}</span>
+            </div>
+          </div>
+
+          <!-- Right: CTA -->
+          <div class="slot-row-right">
+            <div class="avail-bar-track">
+              <div class="avail-bar-fill" [style.width.%]="getOccupancy(slot)" [class.full-bar]="slot.booked >= slot.capacity"></div>
+            </div>
+            <button class="cta-btn"
+              [disabled]="slot.booked >= slot.capacity"
+              [class.cta-full]="slot.booked >= slot.capacity"
+              [class.cta-selected]="selectedSlot?.id === slot.id">
+              {{ slot.booked >= slot.capacity ? 'Full' : selectedSlot?.id === slot.id ? '✓ Selected' : 'Select' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Booking Form Panel -->
+    <div class="form-panel">
+
+      <!-- Idle: no slot selected -->
+      <div class="form-idle" *ngIf="!selectedSlot && !successMessage">
+        <span class="idle-icon">👆</span>
+        <h4>Select a Slot</h4>
+        <p>Click any available time slot on the left to start your booking process.</p>
+      </div>
+
+      <!-- Success State -->
+      <div class="success-panel" *ngIf="successMessage">
+        <div class="success-checkmark">🎉</div>
+        <h3>Booking Confirmed!</h3>
+        <p class="success-detail">{{ successMessage }}</p>
+        <div class="success-actions">
+          <button class="btn btn-primary" (click)="reset()">Book Another</button>
+        </div>
+      </div>
+
+      <!-- Booking Form -->
+      <div class="booking-form-inner" *ngIf="selectedSlot && !successMessage">
+        <!-- Selected slot summary -->
+        <div class="selected-slot-summary">
+          <h4>🗓️ Confirm Your Booking</h4>
+          <div class="summary-chips">
+            <span class="chip date-chip">📅 {{ selectedSlot.date }}</span>
+            <span class="chip time-chip">⏰ {{ selectedSlot.time }}</span>
+            <span class="chip seats-chip">🪑 {{ selectedSlot.capacity - selectedSlot.booked }} seat{{ selectedSlot.capacity - selectedSlot.booked !== 1 ? 's' : '' }} left</span>
+          </div>
+        </div>
+
+        <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+          <!-- Name -->
+          <div class="form-group">
+            <label for="bk-name">Your Full Name</label>
+            <input id="bk-name" type="text" formControlName="name" placeholder="e.g. Jane Doe"
+              [class.invalid]="bookingForm.get('name')?.touched && bookingForm.get('name')?.invalid" />
+            <div *ngIf="bookingForm.get('name')?.touched && bookingForm.get('name')?.errors?.['required']" class="err-msg">
+              Name is required.
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="form-group">
+            <label for="bk-contact">Contact (Phone or Email)</label>
+            <input id="bk-contact" type="text" formControlName="contact" placeholder="e.g. +91 98765 43210"
+              [class.invalid]="bookingForm.get('contact')?.touched && bookingForm.get('contact')?.invalid" />
+            <div *ngIf="bookingForm.get('contact')?.touched && bookingForm.get('contact')?.errors?.['required']" class="err-msg">
+              Contact information is required.
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div class="error-alert" *ngIf="errorMessage">
+            <span>⚠️</span>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" (click)="selectedSlot = null" [disabled]="isSubmitting">
+              ← Change Slot
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || bookingForm.invalid">
+              <span *ngIf="!isSubmitting">Confirm Booking</span>
+              <span *ngIf="isSubmitting">⏳ Booking...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="booking-footer">
+    <p>Powered by <strong>SlotWise</strong> · Real-time appointment management</p>
+  </footer>
+</div>

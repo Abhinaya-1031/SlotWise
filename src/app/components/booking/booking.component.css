@@ -1,0 +1,477 @@
+.booking-page {
+  min-height: 100vh;
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.booking-page * {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.booking-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4));
+}
+
+.brand h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+.brand h1 span {
+  color: #6366f1;
+}
+
+.tagline {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* Layout */
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+}
+
+.section-desc {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0 0 24px 0;
+}
+
+/* Slots list */
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.slot-item {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slot-item:hover:not(.disabled) {
+  transform: translateX(4px);
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(30, 41, 59, 0.6);
+}
+
+.slot-item.selected {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.slot-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slot-time-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slot-time-badge .icon {
+  font-size: 1.5rem;
+}
+
+.slot-time-badge .date {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.slot-time-badge .time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.slot-availability {
+  text-align: center;
+}
+
+.spots-info {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.spots-info .remaining {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.spots-info .remaining.no-spots {
+  color: #ef4444;
+}
+
+.spots-info .label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.capacity-desc {
+  font-size: 0.725rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.btn-select {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.15);
+  transition: all 0.2s ease;
+  width: 90px;
+  text-align: center;
+}
+
+.slot-item:hover .btn-select:not([disabled]) {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+}
+
+.slot-item.selected .btn-select {
+  background: #6366f1;
+  color: #ffffff;
+  border-color: #6366f1;
+}
+
+.btn-select.btn-full {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.15);
+  width: auto;
+  cursor: not-allowed;
+}
+
+/* Form side panel */
+.form-card {
+  background: rgba(30, 41, 59, 0.3);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.form-card.active {
+  background: rgba(30, 41, 59, 0.6);
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.form-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.arrow-icon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 16px;
+  animation: bounceLeft 1s infinite alternate;
+}
+
+.form-placeholder h4 {
+  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+}
+
+.form-placeholder p {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.success-panel {
+  text-align: center;
+  padding: 20px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.success-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.success-panel h4 {
+  font-size: 1.25rem;
+  color: #10b981;
+  margin: 0 0 12px 0;
+}
+
+.success-text {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.form-header {
+  margin-bottom: 24px;
+}
+
+.selected-details {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 0.825rem;
+  color: #94a3b8;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+input.invalid {
+  border-color: #ef4444;
+}
+
+input.invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.error-container {
+  margin-top: 6px;
+  min-height: 18px;
+}
+
+.error-msg {
+  color: #f87171;
+  font-size: 0.75rem;
+}
+
+.error-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.alert-icon {
+  font-size: 1.1rem;
+}
+
+.alert-text {
+  color: #fca5a5;
+  font-size: 0.825rem;
+  line-height: 1.4;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  font-weight: 500;
+}
+
+/* Empty states layout */
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: rgba(30, 41, 59, 0.15);
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.15));
+}
+
+.empty-state h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.empty-state p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+/* Keyframes */
+@keyframes bounceLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-6px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .form-card {
+    min-height: auto;
+  }
+}

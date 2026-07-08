@@ -1,0 +1,102 @@
+<div class="slot-list-wrapper">
+
+  <!-- Slot list header with search -->
+  <div class="list-header">
+    <div>
+      <h2>Appointment Slots</h2>
+      <p class="sub">{{ filteredSlots.length }} slot{{ filteredSlots.length !== 1 ? 's' : '' }} configured</p>
+    </div>
+    <div class="search-box" *ngIf="slots.length > 0">
+      <span class="search-icon">🔍</span>
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()"
+        placeholder="Filter by date or time..." class="search-input" />
+      <button *ngIf="searchQuery" (click)="searchQuery = ''; applyFilter()" class="clear-btn">✕</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading slots...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+
+    <!-- Empty: no slots at all -->
+    <div class="empty-state" *ngIf="slots.length === 0">
+      <div class="empty-icon">🗓️</div>
+      <h4>No Slots Yet</h4>
+      <p>Create your first appointment slot using the "New Slot" button above.</p>
+    </div>
+
+    <!-- Empty: search returned nothing -->
+    <div class="empty-state" *ngIf="slots.length > 0 && filteredSlots.length === 0">
+      <div class="empty-icon">🔍</div>
+      <h4>No Matching Slots</h4>
+      <p>No slots match "{{ searchQuery }}". Clear the search to see all slots.</p>
+      <button class="btn btn-secondary mt-12" (click)="searchQuery = ''; applyFilter()">Clear Search</button>
+    </div>
+
+    <!-- Slot Cards Grid -->
+    <div class="slots-grid" *ngIf="filteredSlots.length > 0">
+      <div class="slot-card" *ngFor="let slot of filteredSlots"
+        [class.fully-booked]="slot.booked >= slot.capacity">
+
+        <!-- Status Pill -->
+        <div class="status-pill" [class.full]="slot.booked >= slot.capacity">
+          {{ slot.booked >= slot.capacity ? '🔴 Full' : '🟢 Available' }}
+        </div>
+
+        <!-- Slot Time Block -->
+        <div class="slot-time-block">
+          <span class="slot-big-icon">📅</span>
+          <div>
+            <div class="slot-date">{{ slot.date }}</div>
+            <div class="slot-time">⏰ {{ slot.time }}</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Metrics Row -->
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-val">{{ slot.capacity }}</span>
+            <span class="metric-lbl">Capacity</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val indigo">{{ slot.booked }}</span>
+            <span class="metric-lbl">Booked</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val" [class.red]="slot.capacity - slot.booked === 0">{{ slot.capacity - slot.booked }}</span>
+            <span class="metric-lbl">Remaining</span>
+          </div>
+        </div>
+
+        <!-- Occupancy Bar -->
+        <div class="occ-bar-wrapper">
+          <div class="occ-bar-track">
+            <div class="occ-bar-fill"
+              [style.width.%]="getOccupancy(slot)"
+              [class.bar-full]="slot.booked >= slot.capacity"></div>
+          </div>
+          <span class="occ-label">{{ getOccupancy(slot) }}% filled</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <button class="action-btn edit-btn" (click)="onEdit(slot)" title="Edit slot">
+            ✏️ Edit
+          </button>
+          <button class="action-btn delete-btn"
+            (click)="onDelete(slot.id!, slot.date, slot.time)"
+            [disabled]="deletingId === slot.id"
+            title="Delete slot">
+            {{ deletingId === slot.id ? '⏳ Deleting...' : '🗑️ Delete' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

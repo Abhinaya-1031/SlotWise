@@ -1,0 +1,80 @@
+<div class="form-card">
+  <div class="form-header">
+    <h3>{{ isEditMode ? 'Update Slot Schedule' : 'Schedule Appointment Slot' }}</h3>
+    <button class="close-btn" (click)="onCancel()">✕</button>
+  </div>
+
+  <form [formGroup]="slotForm" (ngSubmit)="onSubmit()">
+    
+    <!-- Date Entry -->
+    <div class="form-group">
+      <label for="date">Date</label>
+      <input 
+        type="date" 
+        id="date" 
+        formControlName="date" 
+        [class.invalid]="slotForm.get('date')?.touched && slotForm.get('date')?.invalid"
+      />
+      <div *ngIf="slotForm.get('date')?.touched" class="error-container">
+        <div class="error-msg" *ngIf="slotForm.get('date')?.errors?.['required']">
+          Date is required.
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Entry -->
+    <div class="form-group">
+      <label for="time">Time</label>
+      <input 
+        type="time" 
+        id="time" 
+        formControlName="time" 
+        [class.invalid]="slotForm.get('time')?.touched && slotForm.get('time')?.invalid"
+      />
+      <div *ngIf="slotForm.get('time')?.touched" class="error-container">
+        <div class="error-msg" *ngIf="slotForm.get('time')?.errors?.['required']">
+          Time is required.
+        </div>
+      </div>
+    </div>
+
+    <!-- Capacity Entry -->
+    <div class="form-group">
+      <label for="capacity">Total Capacity</label>
+      <input 
+        type="number" 
+        id="capacity" 
+        formControlName="capacity" 
+        placeholder="e.g. 5"
+        min="1"
+        [class.invalid]="slotForm.get('capacity')?.touched && slotForm.get('capacity')?.invalid"
+      />
+      <div *ngIf="slotForm.get('capacity')?.touched" class="error-container">
+        <div class="error-msg" *ngIf="slotForm.get('capacity')?.errors?.['required']">
+          Capacity is required.
+        </div>
+        <div class="error-msg" *ngIf="slotForm.get('capacity')?.errors?.['min']">
+          Capacity must be greater than 0.
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Alert Display -->
+    <div class="error-alert" *ngIf="errorMessage">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-text">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Form Submit and Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="isLoading">
+        Cancel
+      </button>
+      <button type="submit" [disabled]="isLoading || slotForm.invalid" class="btn btn-submit">
+        <span *ngIf="!isLoading">{{ isEditMode ? 'Save Changes' : 'Create Slot' }}</span>
+        <span *ngIf="isLoading" class="spinner">Processing...</span>
+      </button>
+    </div>
+
+  </form>
+</div>
