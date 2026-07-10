@@ -1,6 +1,5 @@
 Project Console: https://console.firebase.google.com/project/thinkkk-4f7ea/overview
 Hosting URL: https://thinkkk-4f7ea.web.app
-
 USER LOGIN: 
 EMAIL: abhinayaprakash31@gmail.com
 pswrd: abhinaya
